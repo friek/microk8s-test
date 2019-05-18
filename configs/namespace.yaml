@@ -1,0 +1,6 @@
+# Create a kubernetes namespace to configure deployments and such in.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+  

@@ -1,0 +1,26 @@
+# A Service defines which ports should be listened on.
+# Documentation: https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-pma-service
+spec:
+  selector:
+    # Select the applications to which this service applies. See mysql-pma.yaml 
+    # for the deployment information.
+    app: mysql-pma
+  ports:
+    - name: mysql
+      protocol: TCP
+      # Somehow 3306 is not listened to on the k8s node. In microk8s a random
+      # port is allocated, which is then accessible from outside the VM.
+      port: 3306
+      # The target port is the port on the container.
+      # Also, while you wouldn't be exposing MySQL in this PMA/MySQL test setup
+      # I'll do it anyway to just be able to connect to it from the outside.
+      targetPort: 3306
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

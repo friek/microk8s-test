@@ -1,0 +1,76 @@
+# This file defines a kubernetes Deployment.
+# A Deployment will have kubernetes monitor the state of the containers and 
+# schedule the containers on the k8s nodes.
+# It is also possible to deploy Pods right away, but that's not recommended.
+# See also: https://stackoverflow.com/a/55280757/578745
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-pma-deployment
+  labels:
+    app: mysql-pma
+spec:
+  # For documentation wrt replicas and the template, see:
+  # https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-pma
+  template:
+    metadata:
+      labels:
+        app: mysql-pma
+    spec:
+      volumes:
+        - name: mysql-data
+          hostPath:
+            path: /vol/mysql-data
+      containers:
+        - name: mysql
+          image: mysql:8.0.15
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpass"
+          resources:
+            # Containers can have limits and requests.
+            # The difference is that requests is what containers are guaranteed
+            # to get. Limits contain the resource constraints which a container
+            # is allowed to use at max.
+            # So, if you set limits cpu to 0.250 and memory to 256Mi, the container
+            # will be killed when more than a quarter of a CPU will be used, or
+            # if more than 256MiB of memory will be used.
+            # Limits can never be below requests in values, as that would not make
+            # sense (why allocate more resources than a container would ever be able
+            # to use?)
+            # Also, the resources are always configured per container.
+            limits:
+              cpu: "0.75"
+              memory: "512Mi"
+            # Disabled, because the container won't start on microk8s otherwise.
+            # requests:
+            #   cpu: "0.250"
+            #   memory: "128Mi"
+        - name: pma
+          image: phpmyadmin/phpmyadmin:latest
+          ports:
+            - containerPort: 80
+          env:
+            # The PMA_HOST indicates which host phpmyadmin will connect to.
+            # This is currently set to mysql, but this appears to be wrong.
+            # At this point I'm still unsure how DNS works in k8s, so I still
+            # need to figure this out.
+            - name: PMA_HOST
+              value: "mysql"
+          resources:
+            limits:
+              cpu: "0.250"
+              memory: "256Mi"
+            # requests:
+            #   cpu: "0.250"
+            #   memory: "128Mi"

@@ -21,3 +21,12 @@ On your local machine (this outside the VM) you can configure this in \${HOME}/.
 If it does exist, you need to merge it to be able to connect to the cluster.
 
 Also, the dumped config points to https://127.0.0.1:16443 for the kubernetes API. As you'll want to contact kubernetes from outside the VM, replace 127.0.0.1 with 192.168.34.10. This is the default IP configured in the host only network in Vagrantfile.
+
+## Configuration files.
+
+In the [configs directory](./configs), I've added some deployment configurations. When your local
+kubectl is configured correctly (`kubectl config set-context microk8s`), you should be able to
+apply a configuration. For example:
+
+- Create the kubernetes Service for the MySQL/phpmyadmin test setup: `kubectl apply -f configs/mysql-pma/mysql-pma.yaml`
+- Create a kubernetes dev namespace: `kubectl apply -f configs/namespace.yaml`
