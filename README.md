@@ -25,7 +25,7 @@ Also, the dumped config points to https://127.0.0.1:16443 for the kubernetes API
 ## Configuration files.
 
 In the [configs directory](./configs), I've added some deployment configurations. When your local
-kubectl is configured correctly (`kubectl config set-context microk8s`), you should be able to
+kubectl is configured correctly (`kubectl config use-context microk8s`), you should be able to
 apply a configuration. For example:
 
 - Create the kubernetes Service for the MySQL/phpmyadmin test setup: `kubectl apply -f configs/mysql-pma/mysql-pma.yaml`
